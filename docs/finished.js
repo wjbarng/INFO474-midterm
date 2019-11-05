@@ -5,6 +5,7 @@
   let data = "no data";
   let svgContainer = ""; // keep SVG reference in global scope
   let circle;
+  let size = 10;
   const colors = {
     "Bug": "#4E79A7",
     "Dark": "#A0CBE8",
@@ -27,8 +28,9 @@
   window.onload = function() {
     svgContainer = d3.select('body')
       .append('svg')
-      .attr('width', 1000)
-      .attr('height', 500);
+      .attr('x', 300)
+      .attr('width', 1200)
+      .attr('height', 700);
     // d3.csv is basically fetch but it can be be passed a csv file as a parameter
     d3.csv("pokemon.csv")
       .then((data) => makeScatterPlot(data));
@@ -54,13 +56,31 @@
     // draw title and axes labels
     makeLabels();
 
-    d3.select("body").append("text").text("Legendary: ")
-    var legnedDropDown = d3.select("body")
-                          .append("select")
+    svgContainer.append("text")
+      .attr('x', 1000)
+      .attr('y', 50)
+      .text("Legendary: ")
 
-    d3.select("body").append("text").text("Generation: ")
+    // var legendDropDown = d3.select("body")
+    //                       .append("select")
+
+    var legendDropDown = d3.select("body")
+                          .append("select")
+                          .style("top", "70px")
+                          .style("left", "1010px")
+                          .style("position", 'absolute');
+
+
+    svgContainer.append("text")
+                .attr("x", 1000)
+                .attr("y", 100)
+                .text("Generation: ")
+
     var generationDropDown = d3.select("body")
                     .append("select")
+                    .style("top", "120px")
+                    .style("left", "1010px")
+                    .style("position", 'absolute');
 
     var leg = data.map((row) => row["Legendary"])
     var gen = data.map((row) => row["Generation"])
@@ -76,7 +96,7 @@
     generationOptions.text(function (d) { return d})
     .attr("value", function(d) { return d});
 
-    var legendOptions = legnedDropDown.selectAll("option")
+    var legendOptions = legendDropDown.selectAll("option")
                 .data(legend)
                 .enter()
                 .append("option")
@@ -86,6 +106,7 @@
 
     let generationSelected = "All";
     let legendSelected = "All";
+
     generationDropDown.on("change", function() {
       generationSelected = this.value;
       var displayOthers = this.checked ? "inline" : "none";
@@ -117,10 +138,9 @@
           .attr("display", display);
         }
       }
-
     });
 
-    legnedDropDown.on("change", function() {
+    legendDropDown.on("change", function() {
       legendSelected = this.value;
       var displayOthers = this.checked ? "inline" : "none";
       var display = this.checked ? "none" : "inline";
@@ -154,6 +174,37 @@
       }
 
     });
+
+    svgContainer.append("text")
+    .attr("x", 1000)
+    .attr("y", 190)
+    .text("Type1: ")
+
+    var legend = Object.keys(colors)
+    console.log(Object.keys(colors))
+    
+  // Add one dot in the legend for each name.
+  svgContainer.selectAll("mydots")
+    .data(legend)
+    .enter()
+    .append("rect")
+      .attr("x", 1000)
+      .attr("y", function(d,i){ return 200 + i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", function(d){ return colors[d]})
+
+  // Add one dot in the legend for each name.
+  svgContainer.selectAll("mylabels")
+    .data(legend)
+    .enter()
+    .append("text")
+      .attr("x", 1000 + size*1.2)
+      .attr("y", function(d,i){ return 200 + i*(size+5) + (size/2)}) // 100 is where the first dot appears. 25 is the distance between dots
+      .style("fill", function(d){ return colors[d]})
+      .text(function(d){ return d})
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
 
   }
 
